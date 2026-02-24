@@ -20,3 +20,5 @@ production:
   database: psk_production
   username: <%= ENV["DB_USERNAME"] %>
   password: <%= ENV["DB_PASSWORD"] %>
+  # Render/Heroku: set DATABASE_URL and Rails will use it automatically
+  url: <%= ENV["DATABASE_URL"] if ENV["DATABASE_URL"].present? %>
