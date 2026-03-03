@@ -14,4 +14,5 @@ Rails.application.routes.draw do
 
   resources :certificates, only: [ :index, :create, :update, :destroy ]
   resources :products, only: [ :index, :show, :create, :update, :destroy ]
+  resources :vacancies, only: [ :index, :create, :update, :destroy ]
 end

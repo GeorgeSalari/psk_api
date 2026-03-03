@@ -63,6 +63,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_03_031624) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "vacancies", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
 end
