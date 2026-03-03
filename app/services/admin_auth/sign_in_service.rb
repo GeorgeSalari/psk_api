@@ -12,7 +12,7 @@ module AdminAuth
 
       data = contract.to_h
       admin = ::Admin.find_by(email: data[:email])
-      return failure(["Invalid email or password"]) unless admin&.authenticate(data[:password])
+      return failure([ "Invalid email or password" ]) unless admin&.authenticate(data[:password])
 
       token = JwtService.encode({ admin_id: admin.id, email: admin.email })
       success(token)

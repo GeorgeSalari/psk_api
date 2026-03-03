@@ -11,7 +11,7 @@ module Certificates
       @certificate.destroy!
       { success: true }
     rescue ActiveRecord::RecordNotDestroyed => e
-      { success: false, errors: [e.message] }
+      { success: false, errors: [ e.message ] }
     end
   end
 end
