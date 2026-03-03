@@ -3,8 +3,8 @@
 class CertificatesController < ApplicationController
   include Authenticatable
 
-  before_action :authenticate_admin!, except: [:index]
-  before_action :set_certificate, only: [:update, :destroy]
+  before_action :authenticate_admin!, except: [ :index ]
+  before_action :set_certificate, only: [ :update, :destroy ]
 
   def index
     certificates = Certificate.with_attached_photo.order(created_at: :desc)
@@ -46,7 +46,7 @@ class CertificatesController < ApplicationController
   def set_certificate
     @certificate = Certificate.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    render json: { error: 'Certificate not found' }, status: :not_found
+    render json: { error: "Certificate not found" }, status: :not_found
   end
 
   def certificate_params

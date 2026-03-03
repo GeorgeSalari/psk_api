@@ -23,11 +23,11 @@ module AdminAuth
     private
 
     def validate_email
-      @errors << 'Email is required' if @email.blank?
+      @errors << "Email is required" if @email.blank?
     end
 
     def validate_password
-      @errors << 'Password is required' if @password.blank?
+      @errors << "Password is required" if @password.blank?
     end
   end
 end

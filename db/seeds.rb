@@ -2,8 +2,8 @@
 
 $stdout.sync = true
 
-email = ENV['ADMIN_EMAIL']
-password = ENV['ADMIN_PASSWORD']
+email = ENV["ADMIN_EMAIL"]
+password = ENV["ADMIN_PASSWORD"]
 
 puts "=== Running seeds ==="
 puts "ADMIN_EMAIL present: #{email.present?}"

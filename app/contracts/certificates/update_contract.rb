@@ -11,7 +11,7 @@ module Certificates
     end
 
     def valid?
-      validate_name if @name.present? || @name == ''
+      validate_name if @name.present? || @name == ""
       @errors.empty?
     end
 
@@ -25,7 +25,7 @@ module Certificates
     private
 
     def validate_name
-      @errors << 'Name cannot be blank' if @name.blank?
+      @errors << "Name cannot be blank" if @name.blank?
     end
   end
 end

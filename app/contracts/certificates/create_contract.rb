@@ -23,11 +23,11 @@ module Certificates
     private
 
     def validate_name
-      @errors << 'Name is required' if @name.blank?
+      @errors << "Name is required" if @name.blank?
     end
 
     def validate_photo
-      @errors << 'Photo is required' unless @photo.present?
+      @errors << "Photo is required" unless @photo.present?
     end
   end
 end
