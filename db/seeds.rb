@@ -1,9 +1,23 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# frozen_string_literal: true
+
+$stdout.sync = true
+
+email = ENV['ADMIN_EMAIL']
+password = ENV['ADMIN_PASSWORD']
+
+puts "=== Running seeds ==="
+puts "ADMIN_EMAIL present: #{email.present?}"
+puts "ADMIN_PASSWORD present: #{password.present?}"
+
+if email.present? && password.present?
+  admin = Admin.find_or_initialize_by(email: email)
+  admin.password = password
+
+  if admin.save
+    puts "=== Admin saved successfully: #{email} (id: #{admin.id}) ==="
+  else
+    puts "=== Admin save FAILED: #{admin.errors.full_messages.join(', ')} ==="
+  end
+else
+  puts "=== Skipping: ADMIN_EMAIL or ADMIN_PASSWORD not set ==="
+end
