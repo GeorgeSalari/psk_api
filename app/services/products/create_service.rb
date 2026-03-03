@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Certificates
+module Products
   class CreateService
     def initialize(params, serializer:, request: nil)
       @params = params
@@ -9,24 +9,24 @@ module Certificates
     end
 
     def call
-      contract = Certificates::CreateContract.new(@params)
+      contract = Products::CreateContract.new(@params)
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
-      certificate = Certificate.new(name: data[:name])
-      certificate.photo.attach(data[:photo])
+      product = Product.new(name: data[:name], description: data[:description])
+      product.photo.attach(data[:photo])
 
-      if certificate.save
-        success(certificate)
+      if product.save
+        success(product)
       else
-        failure(certificate.errors.full_messages)
+        failure(product.errors.full_messages)
       end
     end
 
     private
 
-    def success(certificate)
-      { success: true, data: @serializer.new(certificate, request: @request).as_json }
+    def success(product)
+      { success: true, data: @serializer.new(product, request: @request).as_json }
     end
 
     def failure(errors)

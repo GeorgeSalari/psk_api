@@ -7,25 +7,25 @@ class CertificatesController < ApplicationController
   before_action :set_certificate, only: [ :update, :destroy ]
 
   def index
-    certificates = Certificate.with_attached_photo.order(created_at: :desc)
-    render json: CertificateSerializer.collection(certificates, request: request)
+    result = Certificates::IndexService.new(serializer: CertificateSerializer, request: request).call
+    render json: result[:data]
   end
 
   def create
-    result = Certificates::CreateService.new(certificate_params).call
+    result = Certificates::CreateService.new(certificate_params, serializer: CertificateSerializer, request: request).call
 
     if result[:success]
-      render json: CertificateSerializer.new(result[:certificate], request: request).as_json, status: :created
+      render json: result[:data], status: :created
     else
       render json: { errors: result[:errors] }, status: :unprocessable_entity
     end
   end
 
   def update
-    result = Certificates::UpdateService.new(@certificate, certificate_params).call
+    result = Certificates::UpdateService.new(@certificate, certificate_params, serializer: CertificateSerializer, request: request).call
 
     if result[:success]
-      render json: CertificateSerializer.new(result[:certificate], request: request).as_json
+      render json: result[:data]
     else
       render json: { errors: result[:errors] }, status: :unprocessable_entity
     end

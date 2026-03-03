@@ -2,9 +2,11 @@
 
 module Certificates
   class UpdateService
-    def initialize(certificate, params)
+    def initialize(certificate, params, serializer:, request: nil)
       @certificate = certificate
       @params = params
+      @serializer = serializer
+      @request = request
     end
 
     def call
@@ -25,7 +27,7 @@ module Certificates
     private
 
     def success(certificate)
-      { success: true, certificate: certificate }
+      { success: true, data: @serializer.new(certificate, request: @request).as_json }
     end
 
     def failure(errors)
