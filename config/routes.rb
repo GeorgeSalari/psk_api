@@ -11,4 +11,6 @@ Rails.application.routes.draw do
   scope :admin do
     post "sign_in", to: "admin_sessions#create"
   end
+
+  resources :certificates, only: [:index, :create, :update, :destroy]
 end
