@@ -7,4 +7,8 @@ Rails.application.routes.draw do
   # Root API info
   root "health#index"
   get "api", to: "health#index"
+
+  scope :admin do
+    post "sign_in", to: "admin_sessions#create"
+  end
 end
