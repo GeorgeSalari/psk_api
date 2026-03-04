@@ -9,7 +9,7 @@ gem "redis", "~> 5.0"
 gem "sidekiq", "~> 8.0"
 gem "rack-cors"
 gem "bcrypt", "~> 3.1"
-gem "jwt", "~> 2.9"
+gem "jwt", "~> 3.1"
 gem "aws-sdk-s3", require: false
 gem "bootsnap", require: false
 
