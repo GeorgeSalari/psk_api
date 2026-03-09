@@ -7,18 +7,18 @@ module Products
     def initialize(params)
       @name = params[:name].to_s.strip
       @description = params[:description].to_s
-      @photo = params[:photo]
+      @photos = Array(params[:photos]).select(&:present?)
       @errors = []
     end
 
     def valid?
       validate_name
-      validate_photo
+      validate_photos
       @errors.empty?
     end
 
     def to_h
-      { name: @name, description: @description, photo: @photo }
+      { name: @name, description: @description, photos: @photos }
     end
 
     private
@@ -27,8 +27,8 @@ module Products
       @errors << "Name is required" if @name.blank?
     end
 
-    def validate_photo
-      @errors << "Photo is required" unless @photo.present?
+    def validate_photos
+      @errors << "At least one photo is required" if @photos.empty?
     end
   end
 end

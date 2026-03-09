@@ -7,7 +7,7 @@ module Products
     end
 
     def call
-      @product.photo.purge if @product.photo.attached?
+      @product.photos.purge if @product.photos.attached?
       @product.destroy!
       { success: true }
     rescue ActiveRecord::RecordNotDestroyed => e

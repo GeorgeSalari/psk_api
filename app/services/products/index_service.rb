@@ -8,7 +8,7 @@ module Products
     end
 
     def call
-      products = Product.with_attached_photo.order(created_at: :desc)
+      products = Product.with_attached_photos.order(created_at: :desc)
       data = products.map { |p| @serializer.new(p, request: @request).as_json }
       { success: true, data: data }
     end

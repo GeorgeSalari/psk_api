@@ -7,7 +7,9 @@ module Products
     def initialize(params)
       @name = params[:name]&.strip
       @description = params[:description]
-      @photo = params[:photo]
+      @photos = params[:photos] ? Array(params[:photos]).select(&:present?) : nil
+      @remove_photo_ids = params[:remove_photo_ids] ? Array(params[:remove_photo_ids]).map(&:to_i) : nil
+      @photo_positions = params[:photo_positions]
       @errors = []
     end
 
@@ -20,7 +22,9 @@ module Products
       result = {}
       result[:name] = @name if @name.present?
       result[:description] = @description unless @description.nil?
-      result[:photo] = @photo if @photo.present?
+      result[:photos] = @photos if @photos
+      result[:remove_photo_ids] = @remove_photo_ids if @remove_photo_ids
+      result[:photo_positions] = @photo_positions if @photo_positions
       result
     end
 

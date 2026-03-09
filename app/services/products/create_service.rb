@@ -14,10 +14,11 @@ module Products
 
       data = contract.to_h
       product = Product.new(name: data[:name], description: data[:description])
-      product.photo.attach(data[:photo])
+      product.photos.attach(data[:photos])
 
       if product.save
-        success(product)
+        product.update(photo_positions: product.photos.map(&:id))
+        success(product.reload)
       else
         failure(product.errors.full_messages)
       end

@@ -60,6 +60,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_03_031624) do
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name", null: false
+    t.jsonb "photo_positions", default: []
     t.datetime "updated_at", null: false
   end
 
