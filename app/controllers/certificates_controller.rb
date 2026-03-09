@@ -4,10 +4,15 @@ class CertificatesController < ApplicationController
   include Authenticatable
 
   before_action :authenticate_admin!, except: [ :index ]
-  before_action :set_certificate, only: [ :update, :destroy ]
+  before_action :set_certificate, only: [ :update, :destroy, :toggle_display ]
 
   def index
-    result = Certificates::IndexService.new(serializer: CertificateSerializer, request: request).call
+    published_only = params[:published] == "true"
+    result = Certificates::IndexService.new(
+      serializer: CertificateSerializer,
+      request: request,
+      published_only: published_only
+    ).call
     render json: result[:data]
   end
 
@@ -33,6 +38,26 @@ class CertificatesController < ApplicationController
 
   def destroy
     result = Certificates::DestroyService.new(@certificate).call
+
+    if result[:success]
+      head :no_content
+    else
+      render json: { errors: result[:errors] }, status: :unprocessable_entity
+    end
+  end
+
+  def toggle_display
+    result = Shared::ToggleDisplayService.new(@certificate, serializer: CertificateSerializer, request: request).call
+
+    if result[:success]
+      render json: result[:data]
+    else
+      render json: { errors: result[:errors] }, status: :unprocessable_entity
+    end
+  end
+
+  def reorder
+    result = Shared::ReorderService.new(Certificate, params[:ids]).call
 
     if result[:success]
       head :no_content

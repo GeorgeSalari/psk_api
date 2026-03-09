@@ -12,7 +12,30 @@ Rails.application.routes.draw do
     post "sign_in", to: "admin_sessions#create"
   end
 
-  resources :certificates, only: [ :index, :create, :update, :destroy ]
-  resources :products, only: [ :index, :show, :create, :update, :destroy ]
-  resources :vacancies, only: [ :index, :create, :update, :destroy ]
+  resources :certificates, only: [ :index, :create, :update, :destroy ] do
+    member do
+      patch :toggle_display
+    end
+    collection do
+      patch :reorder
+    end
+  end
+
+  resources :products, only: [ :index, :show, :create, :update, :destroy ] do
+    member do
+      patch :toggle_display
+    end
+    collection do
+      patch :reorder
+    end
+  end
+
+  resources :vacancies, only: [ :index, :create, :update, :destroy ] do
+    member do
+      patch :toggle_display
+    end
+    collection do
+      patch :reorder
+    end
+  end
 end

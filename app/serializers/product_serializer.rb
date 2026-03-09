@@ -9,10 +9,13 @@ class ProductSerializer
   def as_json
     {
       id: @product.id,
+      slug: @product.slug,
       name: @product.name,
       description: @product.description,
       photo_urls: photo_urls,
       photo_ids: @product.ordered_photo_ids,
+      display: @product.display,
+      position: @product.position,
       created_at: @product.created_at
     }
   end

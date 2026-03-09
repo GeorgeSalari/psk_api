@@ -11,6 +11,8 @@ class CertificateSerializer
       id: @certificate.id,
       name: @certificate.name,
       photo_url: photo_url,
+      display: @certificate.display,
+      position: @certificate.position,
       created_at: @certificate.created_at
     }
   end

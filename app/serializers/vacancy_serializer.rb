@@ -12,6 +12,8 @@ class VacancySerializer
       name: @vacancy.name,
       description: @vacancy.description,
       photo_url: photo_url,
+      display: @vacancy.display,
+      position: @vacancy.position,
       created_at: @vacancy.created_at
     }
   end
