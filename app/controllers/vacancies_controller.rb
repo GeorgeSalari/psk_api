@@ -6,30 +6,40 @@ class VacanciesController < ApplicationController
   before_action :authenticate_admin!, except: [ :index ]
 
   def index
-    handle_result Vacancies::IndexService.new(input, serializer: VacancySerializer).call
+    handle_result result
   end
 
   def create
-    handle_result Vacancies::CreateService.new(input, serializer: VacancySerializer).call, success_status: :created
+    handle_result result, success_status: :created
   end
 
   def update
-    handle_result Vacancies::UpdateService.new(input, serializer: VacancySerializer).call
+    handle_result result
   end
 
   def destroy
-    handle_result Vacancies::DestroyService.new(input).call, success_status: :no_content
+    handle_result result, success_status: :no_content
   end
 
   def toggle_display
-    handle_result Shared::ToggleDisplayService.new(input, serializer: VacancySerializer).call
+    handle_result result
   end
 
   def reorder
-    handle_result Shared::ReorderService.new(input).call, success_status: :no_content
+    handle_result result, success_status: :no_content
   end
 
   private
+
+  def result
+    service.new(input, serializer: VacancySerializer).call
+  end
+
+  def service
+    "Vacancies::#{action_name.camelize}Service".constantize
+  rescue NameError
+    "Shared::#{action_name.camelize}Service".constantize
+  end
 
   def input
     { resource: Vacancy, id: params[:id], ids: params[:ids], params: vacancy_params, request: request }

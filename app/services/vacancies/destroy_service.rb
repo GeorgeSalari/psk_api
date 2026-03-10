@@ -1,26 +1,16 @@
 # frozen_string_literal: true
 
 module Vacancies
-  class DestroyService
-    def initialize(input, serializer: nil)
-      @input = input
-    end
-
+  class DestroyService < BaseService
     def call
       vacancy = Vacancy.find_by(id: @input[:id])
       return not_found("Vacancy not found") unless vacancy
 
       vacancy.photo.purge if vacancy.photo.attached?
       vacancy.destroy!
-      { success: true }
+      success
     rescue ActiveRecord::RecordNotDestroyed => e
-      { success: false, errors: [ e.message ] }
-    end
-
-    private
-
-    def not_found(message)
-      { success: false, not_found: true, errors: [ message ] }
+      failure([ e.message ])
     end
   end
 end

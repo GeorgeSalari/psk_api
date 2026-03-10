@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 module Analytics
-  class PagesService
-    def initialize(input, serializer: nil)
-      @input = input
-    end
-
+  class PagesService < BaseService
     def call
       contract = Analytics::PeriodContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
@@ -18,13 +14,7 @@ module Analytics
         .limit(20)
         .count
 
-      { success: true, data: rows.map { |page, count| { page: page, views: count } } }
-    end
-
-    private
-
-    def failure(errors)
-      { success: false, errors: errors }
+      success(rows.map { |page, count| { page: page, views: count } })
     end
   end
 end

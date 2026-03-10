@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 module AdminAuth
-  class SignInService
-    def initialize(input, serializer: nil)
-      @input = input
-    end
-
+  class SignInService < BaseService
     def call
       contract = AdminAuth::SignInContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
@@ -15,17 +11,7 @@ module AdminAuth
       return unauthorized([ "Invalid email or password" ]) unless admin&.authenticate(data[:password])
 
       token = JwtService.encode({ admin_id: admin.id, email: admin.email })
-      { success: true, data: { token: token } }
-    end
-
-    private
-
-    def unauthorized(errors)
-      { success: false, unauthorized: true, errors: errors }
-    end
-
-    def failure(errors)
-      { success: false, errors: errors }
+      success({ token: token })
     end
   end
 end

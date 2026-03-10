@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 module Products
-  class IndexService
-    def initialize(input, serializer: nil)
-      @input = input
-      @serializer = serializer
-    end
-
+  class IndexService < BaseService
     def call
       contract = Products::IndexContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
@@ -19,14 +14,7 @@ module Products
           Product.with_attached_photos.order(created_at: :desc)
         end
 
-      serialized = products.map { |p| @serializer.new(p, request: @input[:request]).as_json }
-      { success: true, data: serialized }
-    end
-
-    private
-
-    def failure(errors)
-      { success: false, errors: errors }
+      success(serialize_collection(products))
     end
   end
 end

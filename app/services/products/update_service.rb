@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 module Products
-  class UpdateService
-    def initialize(input, serializer: nil)
-      @input = input
-      @serializer = serializer
-    end
-
+  class UpdateService < BaseService
     def call
       product = Product.find_by(id: @input[:id])
       return not_found("Product not found") unless product
@@ -23,7 +18,7 @@ module Products
 
       if product.save
         update_positions(product, data[:photo_positions]) if data.key?(:photo_positions)
-        { success: true, data: @serializer.new(product.reload, request: @input[:request]).as_json }
+        success(serialize(product.reload))
       else
         failure(product.errors.full_messages)
       end
@@ -44,14 +39,6 @@ module Products
       else
         product.update(photo_positions: product.photos.map(&:id))
       end
-    end
-
-    def not_found(message)
-      { success: false, not_found: true, errors: [ message ] }
-    end
-
-    def failure(errors)
-      { success: false, errors: errors }
     end
   end
 end

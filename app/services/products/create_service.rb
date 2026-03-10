@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 module Products
-  class CreateService
-    def initialize(input, serializer: nil)
-      @input = input
-      @serializer = serializer
-    end
-
+  class CreateService < BaseService
     def call
       contract = Products::CreateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
@@ -17,16 +12,10 @@ module Products
 
       if product.save
         product.update(photo_positions: product.photos.map(&:id))
-        { success: true, data: @serializer.new(product.reload, request: @input[:request]).as_json }
+        success(serialize(product.reload))
       else
         failure(product.errors.full_messages)
       end
-    end
-
-    private
-
-    def failure(errors)
-      { success: false, errors: errors }
     end
   end
 end

@@ -6,30 +6,40 @@ class CertificatesController < ApplicationController
   before_action :authenticate_admin!, except: [ :index ]
 
   def index
-    handle_result Certificates::IndexService.new(input, serializer: CertificateSerializer).call
+    handle_result result
   end
 
   def create
-    handle_result Certificates::CreateService.new(input, serializer: CertificateSerializer).call, success_status: :created
+    handle_result result, success_status: :created
   end
 
   def update
-    handle_result Certificates::UpdateService.new(input, serializer: CertificateSerializer).call
+    handle_result result
   end
 
   def destroy
-    handle_result Certificates::DestroyService.new(input).call, success_status: :no_content
+    handle_result result, success_status: :no_content
   end
 
   def toggle_display
-    handle_result Shared::ToggleDisplayService.new(input, serializer: CertificateSerializer).call
+    handle_result result
   end
 
   def reorder
-    handle_result Shared::ReorderService.new(input).call, success_status: :no_content
+    handle_result result, success_status: :no_content
   end
 
   private
+
+  def result
+    service.new(input, serializer: CertificateSerializer).call
+  end
+
+  def service
+    "Certificates::#{action_name.camelize}Service".constantize
+  rescue NameError
+    "Shared::#{action_name.camelize}Service".constantize
+  end
 
   def input
     { resource: Certificate, id: params[:id], ids: params[:ids], params: certificate_params, request: request }

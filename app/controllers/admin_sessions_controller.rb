@@ -2,10 +2,18 @@
 
 class AdminSessionsController < ApplicationController
   def create
-    handle_result AdminAuth::SignInService.new(input).call
+    handle_result result
   end
 
   private
+
+  def result
+    service.new(input).call
+  end
+
+  def service
+    AdminAuth::SignInService
+  end
 
   def input
     { params: params.permit(:email, :password), request: request }

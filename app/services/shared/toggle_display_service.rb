@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 module Shared
-  class ToggleDisplayService
-    def initialize(input, serializer: nil)
-      @input = input
-      @serializer = serializer
-    end
-
+  class ToggleDisplayService < BaseService
     def call
       model_class = @input[:resource]
       record = model_class.find_by(id: @input[:id])
@@ -22,9 +17,9 @@ module Shared
         reindex_positions(record)
       end
 
-      { success: true, data: @serializer.new(record.reload, request: @input[:request]).as_json }
+      success(serialize(record.reload))
     rescue ActiveRecord::RecordInvalid => e
-      { success: false, errors: e.record.errors.full_messages }
+      failure(e.record.errors.full_messages)
     end
 
     private
@@ -33,10 +28,6 @@ module Shared
       record.class.published.each_with_index do |r, idx|
         r.update_column(:position, idx + 1)
       end
-    end
-
-    def not_found(message)
-      { success: false, not_found: true, errors: [ message ] }
     end
   end
 end

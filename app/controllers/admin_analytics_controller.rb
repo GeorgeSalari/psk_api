@@ -6,22 +6,30 @@ class AdminAnalyticsController < ApplicationController
   before_action :authenticate_admin!
 
   def overview
-    handle_result Analytics::OverviewService.new(input).call
+    handle_result result
   end
 
   def pages
-    handle_result Analytics::PagesService.new(input).call
+    handle_result result
   end
 
   def events
-    handle_result Analytics::EventsService.new(input).call
+    handle_result result
   end
 
   def visitors_chart
-    handle_result Analytics::VisitorsChartService.new(input).call
+    handle_result result
   end
 
   private
+
+  def result
+    service.new(input).call
+  end
+
+  def service
+    "Analytics::#{action_name.camelize}Service".constantize
+  end
 
   def input
     { params: { period: params[:period] }, request: request }

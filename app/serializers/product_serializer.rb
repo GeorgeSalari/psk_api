@@ -1,44 +1,25 @@
 # frozen_string_literal: true
 
-class ProductSerializer
-  def initialize(product, request: nil)
-    @product = product
-    @request = request
-  end
-
+class ProductSerializer < BaseSerializer
   def as_json
     {
-      id: @product.id,
-      slug: @product.slug,
-      name: @product.name,
-      description: @product.description,
+      id: @record.id,
+      slug: @record.slug,
+      name: @record.name,
+      description: @record.description,
       photo_urls: photo_urls,
-      photo_ids: @product.ordered_photo_ids,
-      display: @product.display,
-      position: @product.position,
-      created_at: @product.created_at
+      photo_ids: @record.ordered_photo_ids,
+      display: @record.display,
+      position: @record.position,
+      created_at: @record.created_at
     }
-  end
-
-  def self.collection(products, request: nil)
-    products.map { |p| new(p, request: request).as_json }
   end
 
   private
 
   def photo_urls
-    return [] unless @product.photos.attached?
+    return [] unless @record.photos.attached?
 
-    @product.ordered_photos.map do |photo|
-      if @request
-        Rails.application.routes.url_helpers.rails_blob_url(photo, host: host_with_port)
-      else
-        Rails.application.routes.url_helpers.rails_blob_path(photo, only_path: true)
-      end
-    end
-  end
-
-  def host_with_port
-    "#{@request.protocol}#{@request.host_with_port}"
+    @record.ordered_photos.map { |photo| build_blob_url(photo) }
   end
 end

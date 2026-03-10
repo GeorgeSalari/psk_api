@@ -6,34 +6,44 @@ class ProductsController < ApplicationController
   before_action :authenticate_admin!, except: [ :index, :show ]
 
   def index
-    handle_result Products::IndexService.new(input, serializer: ProductSerializer).call
+    handle_result result
   end
 
   def show
-    handle_result Products::ShowService.new(input, serializer: ProductSerializer).call
+    handle_result result
   end
 
   def create
-    handle_result Products::CreateService.new(input, serializer: ProductSerializer).call, success_status: :created
+    handle_result result, success_status: :created
   end
 
   def update
-    handle_result Products::UpdateService.new(input, serializer: ProductSerializer).call
+    handle_result result
   end
 
   def destroy
-    handle_result Products::DestroyService.new(input).call, success_status: :no_content
+    handle_result result, success_status: :no_content
   end
 
   def toggle_display
-    handle_result Shared::ToggleDisplayService.new(input, serializer: ProductSerializer).call
+    handle_result result
   end
 
   def reorder
-    handle_result Shared::ReorderService.new(input).call, success_status: :no_content
+    handle_result result, success_status: :no_content
   end
 
   private
+
+  def result
+    service.new(input, serializer: ProductSerializer).call
+  end
+
+  def service
+    "Products::#{action_name.camelize}Service".constantize
+  rescue NameError
+    "Shared::#{action_name.camelize}Service".constantize
+  end
 
   def input
     { resource: Product, id: params[:id], ids: params[:ids], params: product_params, request: request }
