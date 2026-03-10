@@ -6,48 +6,40 @@ class ProductsController < ApplicationController
   before_action :authenticate_admin!, except: [ :index, :show ]
 
   def index
-    published_only = params[:published] == "true"
-    result = Products::IndexService.new(
-      serializer: ProductSerializer,
-      request: request,
-      published_only: published_only
-    ).call
-    render json: result[:data]
+    handle_result Products::IndexService.new(input, serializer: ProductSerializer).call
   end
 
   def show
-    result = Products::ShowService.new(params[:id], serializer: ProductSerializer, request: request).call
-    handle_result(result)
+    handle_result Products::ShowService.new(input, serializer: ProductSerializer).call
   end
 
   def create
-    result = Products::CreateService.new(product_params, serializer: ProductSerializer, request: request).call
-    handle_result(result, success_status: :created)
+    handle_result Products::CreateService.new(input, serializer: ProductSerializer).call, success_status: :created
   end
 
   def update
-    result = Products::UpdateService.new(params[:id], product_params, serializer: ProductSerializer, request: request).call
-    handle_result(result)
+    handle_result Products::UpdateService.new(input, serializer: ProductSerializer).call
   end
 
   def destroy
-    result = Products::DestroyService.new(params[:id]).call
-    handle_result(result, success_status: :no_content)
+    handle_result Products::DestroyService.new(input).call, success_status: :no_content
   end
 
   def toggle_display
-    result = Shared::ToggleDisplayService.new(Product, params[:id], serializer: ProductSerializer, request: request).call
-    handle_result(result)
+    handle_result Shared::ToggleDisplayService.new(input, serializer: ProductSerializer).call
   end
 
   def reorder
-    result = Shared::ReorderService.new(Product, params[:ids]).call
-    handle_result(result, success_status: :no_content)
+    handle_result Shared::ReorderService.new(input).call, success_status: :no_content
   end
 
   private
 
+  def input
+    { resource: Product, id: params[:id], ids: params[:ids], params: product_params, request: request }
+  end
+
   def product_params
-    params.permit(:name, :description, :photo_positions, photos: [], remove_photo_ids: [])
+    params.permit(:name, :description, :photo_positions, :published, photos: [], remove_photo_ids: [])
   end
 end

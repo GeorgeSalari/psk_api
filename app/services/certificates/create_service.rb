@@ -2,14 +2,13 @@
 
 module Certificates
   class CreateService
-    def initialize(params, serializer:, request: nil)
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      contract = Certificates::CreateContract.new(@params)
+      contract = Certificates::CreateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -17,17 +16,13 @@ module Certificates
       certificate.photo.attach(data[:photo])
 
       if certificate.save
-        success(certificate)
+        { success: true, data: @serializer.new(certificate, request: @input[:request]).as_json }
       else
         failure(certificate.errors.full_messages)
       end
     end
 
     private
-
-    def success(certificate)
-      { success: true, data: @serializer.new(certificate, request: @request).as_json }
-    end
 
     def failure(errors)
       { success: false, errors: errors }

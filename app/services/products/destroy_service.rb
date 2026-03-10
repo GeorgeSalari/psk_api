@@ -2,12 +2,12 @@
 
 module Products
   class DestroyService
-    def initialize(id)
-      @id = id
+    def initialize(input, serializer: nil)
+      @input = input
     end
 
     def call
-      product = Product.find_by(id: @id)
+      product = Product.find_by(id: @input[:id])
       return not_found("Product not found") unless product
 
       product.photos.purge if product.photos.attached?

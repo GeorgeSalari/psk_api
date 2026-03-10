@@ -2,21 +2,31 @@
 
 module Products
   class IndexService
-    def initialize(serializer:, request: nil, published_only: false)
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
-      @published_only = published_only
     end
 
     def call
+      contract = Products::IndexContract.new(@input[:params])
+      return failure(contract.errors) unless contract.valid?
+
+      data = contract.to_h
       products =
-        if @published_only
+        if data[:published_only]
           Product.published.with_attached_photos
         else
           Product.with_attached_photos.order(created_at: :desc)
         end
-      data = products.map { |p| @serializer.new(p, request: @request).as_json }
-      { success: true, data: data }
+
+      serialized = products.map { |p| @serializer.new(p, request: @input[:request]).as_json }
+      { success: true, data: serialized }
+    end
+
+    private
+
+    def failure(errors)
+      { success: false, errors: errors }
     end
   end
 end

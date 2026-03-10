@@ -2,19 +2,18 @@
 
 module CallRequests
   class IndexService
-    def initialize(params, serializer:, request: nil)
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      contract = CallRequests::IndexContract.new(@params)
+      contract = CallRequests::IndexContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
       records = data[:filter] == "processed" ? CallRequest.processed : CallRequest.pending
-      serialized = records.map { |r| @serializer.new(r, request: @request).as_json }
+      serialized = records.map { |r| @serializer.new(r, request: @input[:request]).as_json }
 
       { success: true, data: serialized }
     end

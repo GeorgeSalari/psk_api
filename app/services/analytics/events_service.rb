@@ -2,12 +2,12 @@
 
 module Analytics
   class EventsService
-    def initialize(params)
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
     end
 
     def call
-      contract = Analytics::PeriodContract.new(@params)
+      contract = Analytics::PeriodContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       rows = Ahoy::Event

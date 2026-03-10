@@ -2,18 +2,16 @@
 
 module Products
   class UpdateService
-    def initialize(id, params, serializer:, request: nil)
-      @id = id
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      product = Product.find_by(id: @id)
+      product = Product.find_by(id: @input[:id])
       return not_found("Product not found") unless product
 
-      contract = Products::UpdateContract.new(@params)
+      contract = Products::UpdateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -25,7 +23,7 @@ module Products
 
       if product.save
         update_positions(product, data[:photo_positions]) if data.key?(:photo_positions)
-        { success: true, data: @serializer.new(product.reload, request: @request).as_json }
+        { success: true, data: @serializer.new(product.reload, request: @input[:request]).as_json }
       else
         failure(product.errors.full_messages)
       end

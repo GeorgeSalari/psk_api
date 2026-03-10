@@ -6,35 +6,24 @@ class CallRequestsController < ApplicationController
   before_action :authenticate_admin!, only: [ :index, :change_state ]
 
   def create
-    result = CallRequests::CreateService.new(
-      call_request_params,
-      serializer: CallRequestSerializer,
-      request: request
-    ).call
-    handle_result(result, success_status: :created)
+    handle_result CallRequests::CreateService.new(input, serializer: CallRequestSerializer).call, success_status: :created
   end
 
   def index
-    result = CallRequests::IndexService.new(
-      { filter: params[:filter] },
-      serializer: CallRequestSerializer,
-      request: request
-    ).call
-    handle_result(result)
+    handle_result CallRequests::IndexService.new(input, serializer: CallRequestSerializer).call
   end
 
   def change_state
-    result = CallRequests::ChangeStateService.new(
-      params[:id],
-      serializer: CallRequestSerializer,
-      request: request
-    ).call
-    handle_result(result)
+    handle_result CallRequests::ChangeStateService.new(input, serializer: CallRequestSerializer).call
   end
 
   private
 
+  def input
+    { resource: CallRequest, id: params[:id], params: call_request_params, request: request }
+  end
+
   def call_request_params
-    params.permit(:contact_name, :phone, :comment)
+    params.permit(:contact_name, :phone, :comment, :filter)
   end
 end

@@ -2,21 +2,31 @@
 
 module Certificates
   class IndexService
-    def initialize(serializer:, request: nil, published_only: false)
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
-      @published_only = published_only
     end
 
     def call
+      contract = Certificates::IndexContract.new(@input[:params])
+      return failure(contract.errors) unless contract.valid?
+
+      data = contract.to_h
       certificates =
-        if @published_only
+        if data[:published_only]
           Certificate.published.with_attached_photo
         else
           Certificate.with_attached_photo.order(created_at: :desc)
         end
-      data = certificates.map { |c| @serializer.new(c, request: @request).as_json }
-      { success: true, data: data }
+
+      serialized = certificates.map { |c| @serializer.new(c, request: @input[:request]).as_json }
+      { success: true, data: serialized }
+    end
+
+    private
+
+    def failure(errors)
+      { success: false, errors: errors }
     end
   end
 end

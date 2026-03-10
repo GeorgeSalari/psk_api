@@ -2,18 +2,16 @@
 
 module Certificates
   class UpdateService
-    def initialize(id, params, serializer:, request: nil)
-      @id = id
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      certificate = Certificate.find_by(id: @id)
+      certificate = Certificate.find_by(id: @input[:id])
       return not_found("Certificate not found") unless certificate
 
-      contract = Certificates::UpdateContract.new(@params)
+      contract = Certificates::UpdateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -21,7 +19,7 @@ module Certificates
       certificate.photo.attach(data[:photo]) if data.key?(:photo)
 
       if certificate.save
-        { success: true, data: @serializer.new(certificate, request: @request).as_json }
+        { success: true, data: @serializer.new(certificate, request: @input[:request]).as_json }
       else
         failure(certificate.errors.full_messages)
       end

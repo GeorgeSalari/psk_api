@@ -2,14 +2,13 @@
 
 module CallRequests
   class CreateService
-    def initialize(params, serializer:, request: nil)
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      contract = CallRequests::CreateContract.new(@params)
+      contract = CallRequests::CreateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -17,7 +16,7 @@ module CallRequests
 
       if call_request.save
         send_notification(call_request.id)
-        success(call_request)
+        { success: true, data: @serializer.new(call_request, request: @input[:request]).as_json }
       else
         failure(call_request.errors.full_messages)
       end
@@ -29,10 +28,6 @@ module CallRequests
       CallRequestEmailJob.perform_later(call_request_id)
     rescue StandardError => e
       Rails.logger.warn("Failed to enqueue email job for CallRequest ##{call_request_id}: #{e.message}")
-    end
-
-    def success(call_request)
-      { success: true, data: @serializer.new(call_request, request: @request).as_json }
     end
 
     def failure(errors)

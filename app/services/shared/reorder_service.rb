@@ -2,17 +2,17 @@
 
 module Shared
   class ReorderService
-    def initialize(model_class, ids)
-      @model_class = model_class
-      @ids = Array(ids).map(&:to_i)
+    def initialize(input, serializer: nil)
+      @input = input
     end
 
     def call
-      return { success: false, errors: [ "IDs are required" ] } if @ids.empty?
+      ids = Array(@input[:ids]).map(&:to_i)
+      return { success: false, errors: [ "IDs are required" ] } if ids.empty?
 
       ActiveRecord::Base.transaction do
-        @ids.each_with_index do |id, idx|
-          @model_class.where(id: id).update_all(position: idx + 1)
+        ids.each_with_index do |id, idx|
+          @input[:resource].where(id: id).update_all(position: idx + 1)
         end
       end
 

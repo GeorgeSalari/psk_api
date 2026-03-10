@@ -2,18 +2,16 @@
 
 module Vacancies
   class UpdateService
-    def initialize(id, params, serializer:, request: nil)
-      @id = id
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      vacancy = Vacancy.find_by(id: @id)
+      vacancy = Vacancy.find_by(id: @input[:id])
       return not_found("Vacancy not found") unless vacancy
 
-      contract = Vacancies::UpdateContract.new(@params)
+      contract = Vacancies::UpdateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -22,7 +20,7 @@ module Vacancies
       vacancy.photo.attach(data[:photo]) if data.key?(:photo)
 
       if vacancy.save
-        { success: true, data: @serializer.new(vacancy, request: @request).as_json }
+        { success: true, data: @serializer.new(vacancy, request: @input[:request]).as_json }
       else
         failure(vacancy.errors.full_messages)
       end

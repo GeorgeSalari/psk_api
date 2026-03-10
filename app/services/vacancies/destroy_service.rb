@@ -2,12 +2,12 @@
 
 module Vacancies
   class DestroyService
-    def initialize(id)
-      @id = id
+    def initialize(input, serializer: nil)
+      @input = input
     end
 
     def call
-      vacancy = Vacancy.find_by(id: @id)
+      vacancy = Vacancy.find_by(id: @input[:id])
       return not_found("Vacancy not found") unless vacancy
 
       vacancy.photo.purge if vacancy.photo.attached?

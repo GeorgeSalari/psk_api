@@ -2,14 +2,13 @@
 
 module Products
   class CreateService
-    def initialize(params, serializer:, request: nil)
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      contract = Products::CreateContract.new(@params)
+      contract = Products::CreateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -18,17 +17,13 @@ module Products
 
       if product.save
         product.update(photo_positions: product.photos.map(&:id))
-        success(product.reload)
+        { success: true, data: @serializer.new(product.reload, request: @input[:request]).as_json }
       else
         failure(product.errors.full_messages)
       end
     end
 
     private
-
-    def success(product)
-      { success: true, data: @serializer.new(product, request: @request).as_json }
-    end
 
     def failure(errors)
       { success: false, errors: errors }

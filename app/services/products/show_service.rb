@@ -2,18 +2,17 @@
 
 module Products
   class ShowService
-    def initialize(slug, serializer:, request: nil)
-      @slug = slug
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      product = Product.find_by(slug: @slug)
+      product = Product.find_by(slug: @input[:id])
       return not_found("Product not found") unless product
       return not_found("Product not found") unless product.display
 
-      { success: true, data: @serializer.new(product, request: @request).as_json }
+      { success: true, data: @serializer.new(product, request: @input[:request]).as_json }
     end
 
     private

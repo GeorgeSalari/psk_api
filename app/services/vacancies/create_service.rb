@@ -2,14 +2,13 @@
 
 module Vacancies
   class CreateService
-    def initialize(params, serializer:, request: nil)
-      @params = params
+    def initialize(input, serializer: nil)
+      @input = input
       @serializer = serializer
-      @request = request
     end
 
     def call
-      contract = Vacancies::CreateContract.new(@params)
+      contract = Vacancies::CreateContract.new(@input[:params])
       return failure(contract.errors) unless contract.valid?
 
       data = contract.to_h
@@ -17,17 +16,13 @@ module Vacancies
       vacancy.photo.attach(data[:photo])
 
       if vacancy.save
-        success(vacancy)
+        { success: true, data: @serializer.new(vacancy, request: @input[:request]).as_json }
       else
         failure(vacancy.errors.full_messages)
       end
     end
 
     private
-
-    def success(vacancy)
-      { success: true, data: @serializer.new(vacancy, request: @request).as_json }
-    end
 
     def failure(errors)
       { success: false, errors: errors }

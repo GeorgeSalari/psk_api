@@ -2,12 +2,12 @@
 
 module Certificates
   class DestroyService
-    def initialize(id)
-      @id = id
+    def initialize(input, serializer: nil)
+      @input = input
     end
 
     def call
-      certificate = Certificate.find_by(id: @id)
+      certificate = Certificate.find_by(id: @input[:id])
       return not_found("Certificate not found") unless certificate
 
       certificate.photo.purge if certificate.photo.attached?

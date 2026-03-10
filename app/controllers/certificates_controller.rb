@@ -6,43 +6,36 @@ class CertificatesController < ApplicationController
   before_action :authenticate_admin!, except: [ :index ]
 
   def index
-    published_only = params[:published] == "true"
-    result = Certificates::IndexService.new(
-      serializer: CertificateSerializer,
-      request: request,
-      published_only: published_only
-    ).call
-    render json: result[:data]
+    handle_result Certificates::IndexService.new(input, serializer: CertificateSerializer).call
   end
 
   def create
-    result = Certificates::CreateService.new(certificate_params, serializer: CertificateSerializer, request: request).call
-    handle_result(result, success_status: :created)
+    handle_result Certificates::CreateService.new(input, serializer: CertificateSerializer).call, success_status: :created
   end
 
   def update
-    result = Certificates::UpdateService.new(params[:id], certificate_params, serializer: CertificateSerializer, request: request).call
-    handle_result(result)
+    handle_result Certificates::UpdateService.new(input, serializer: CertificateSerializer).call
   end
 
   def destroy
-    result = Certificates::DestroyService.new(params[:id]).call
-    handle_result(result, success_status: :no_content)
+    handle_result Certificates::DestroyService.new(input).call, success_status: :no_content
   end
 
   def toggle_display
-    result = Shared::ToggleDisplayService.new(Certificate, params[:id], serializer: CertificateSerializer, request: request).call
-    handle_result(result)
+    handle_result Shared::ToggleDisplayService.new(input, serializer: CertificateSerializer).call
   end
 
   def reorder
-    result = Shared::ReorderService.new(Certificate, params[:ids]).call
-    handle_result(result, success_status: :no_content)
+    handle_result Shared::ReorderService.new(input).call, success_status: :no_content
   end
 
   private
 
+  def input
+    { resource: Certificate, id: params[:id], ids: params[:ids], params: certificate_params, request: request }
+  end
+
   def certificate_params
-    params.permit(:name, :photo)
+    params.permit(:name, :photo, :published)
   end
 end

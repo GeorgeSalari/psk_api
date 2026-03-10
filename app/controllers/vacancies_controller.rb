@@ -6,43 +6,36 @@ class VacanciesController < ApplicationController
   before_action :authenticate_admin!, except: [ :index ]
 
   def index
-    published_only = params[:published] == "true"
-    result = Vacancies::IndexService.new(
-      serializer: VacancySerializer,
-      request: request,
-      published_only: published_only
-    ).call
-    render json: result[:data]
+    handle_result Vacancies::IndexService.new(input, serializer: VacancySerializer).call
   end
 
   def create
-    result = Vacancies::CreateService.new(vacancy_params, serializer: VacancySerializer, request: request).call
-    handle_result(result, success_status: :created)
+    handle_result Vacancies::CreateService.new(input, serializer: VacancySerializer).call, success_status: :created
   end
 
   def update
-    result = Vacancies::UpdateService.new(params[:id], vacancy_params, serializer: VacancySerializer, request: request).call
-    handle_result(result)
+    handle_result Vacancies::UpdateService.new(input, serializer: VacancySerializer).call
   end
 
   def destroy
-    result = Vacancies::DestroyService.new(params[:id]).call
-    handle_result(result, success_status: :no_content)
+    handle_result Vacancies::DestroyService.new(input).call, success_status: :no_content
   end
 
   def toggle_display
-    result = Shared::ToggleDisplayService.new(Vacancy, params[:id], serializer: VacancySerializer, request: request).call
-    handle_result(result)
+    handle_result Shared::ToggleDisplayService.new(input, serializer: VacancySerializer).call
   end
 
   def reorder
-    result = Shared::ReorderService.new(Vacancy, params[:ids]).call
-    handle_result(result, success_status: :no_content)
+    handle_result Shared::ReorderService.new(input).call, success_status: :no_content
   end
 
   private
 
+  def input
+    { resource: Vacancy, id: params[:id], ids: params[:ids], params: vacancy_params, request: request }
+  end
+
   def vacancy_params
-    params.permit(:name, :description, :photo)
+    params.permit(:name, :description, :photo, :published)
   end
 end
