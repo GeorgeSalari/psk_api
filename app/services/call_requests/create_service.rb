@@ -26,9 +26,9 @@ module CallRequests
     private
 
     def send_notification(call_request_id)
-      CallRequests::SendEmailService.new(call_request_id).call
+      CallRequestEmailJob.perform_later(call_request_id)
     rescue StandardError => e
-      Rails.logger.error("Failed to send call request email ##{call_request_id}: #{e.message}")
+      Rails.logger.warn("Failed to enqueue email job for CallRequest ##{call_request_id}: #{e.message}")
     end
 
     def success(call_request)
