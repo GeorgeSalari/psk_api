@@ -17,7 +17,7 @@ class BaseService
   end
 
   def not_found(message)
-    { success: false, not_found: true, errors: [message] }
+    { success: false, not_found: true, errors: [ message ] }
   end
 
   def unauthorized(errors)
