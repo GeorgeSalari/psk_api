@@ -16,7 +16,7 @@ module CallRequests
       call_request = CallRequest.new(data)
 
       if call_request.save
-        CallRequestEmailJob.perform_later(call_request.id)
+        send_notification(call_request.id)
         success(call_request)
       else
         failure(call_request.errors.full_messages)
@@ -24,6 +24,12 @@ module CallRequests
     end
 
     private
+
+    def send_notification(call_request_id)
+      CallRequests::SendEmailService.new(call_request_id).call
+    rescue StandardError => e
+      Rails.logger.error("Failed to send call request email ##{call_request_id}: #{e.message}")
+    end
 
     def success(call_request)
       { success: true, data: @serializer.new(call_request, request: @request).as_json }
