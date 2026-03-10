@@ -5,10 +5,13 @@ class ApplicationController < ActionController::API
 
   def handle_result(result, success_status: :ok)
     unless result[:success]
-      status = if result[:not_found] then :not_found
-               elsif result[:unauthorized] then :unauthorized
-               else :unprocessable_entity
-               end
+      status = if result[:not_found]
+        :not_found
+      elsif result[:unauthorized]
+        :unauthorized
+      else
+        :unprocessable_entity
+      end
       render json: { errors: result[:errors] }, status: status
       return
     end
