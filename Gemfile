@@ -11,6 +11,7 @@ gem "rack-cors"
 gem "rack-attack"
 gem "bcrypt", "~> 3.1"
 gem "jwt", "~> 2.9"
+gem "ahoy_matey"
 gem "aws-sdk-s3", require: false
 gem "bootsnap", require: false
 

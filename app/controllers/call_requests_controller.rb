@@ -4,7 +4,6 @@ class CallRequestsController < ApplicationController
   include Authenticatable
 
   before_action :authenticate_admin!, only: [ :index, :change_state ]
-  before_action :set_call_request, only: [ :change_state ]
 
   def create
     result = CallRequests::CreateService.new(
@@ -12,12 +11,7 @@ class CallRequestsController < ApplicationController
       serializer: CallRequestSerializer,
       request: request
     ).call
-
-    if result[:success]
-      render json: result[:data], status: :created
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    handle_result(result, success_status: :created)
   end
 
   def index
@@ -26,35 +20,19 @@ class CallRequestsController < ApplicationController
       serializer: CallRequestSerializer,
       request: request
     ).call
-
-    if result[:success]
-      render json: result[:data]
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    handle_result(result)
   end
 
   def change_state
     result = CallRequests::ChangeStateService.new(
-      @call_request,
+      params[:id],
       serializer: CallRequestSerializer,
       request: request
     ).call
-
-    if result[:success]
-      render json: result[:data]
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    handle_result(result)
   end
 
   private
-
-  def set_call_request
-    @call_request = CallRequest.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    render json: { error: "Call request not found" }, status: :not_found
-  end
 
   def call_request_params
     params.permit(:contact_name, :phone, :comment)

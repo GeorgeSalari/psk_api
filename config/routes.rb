@@ -10,6 +10,11 @@ Rails.application.routes.draw do
 
   scope :admin do
     post "sign_in", to: "admin_sessions#create"
+
+    get "analytics/overview", to: "admin_analytics#overview"
+    get "analytics/pages", to: "admin_analytics#pages"
+    get "analytics/events", to: "admin_analytics#events"
+    get "analytics/visitors_chart", to: "admin_analytics#visitors_chart"
   end
 
   resources :certificates, only: [ :index, :create, :update, :destroy ] do

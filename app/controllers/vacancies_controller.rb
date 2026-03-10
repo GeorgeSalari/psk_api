@@ -4,7 +4,6 @@ class VacanciesController < ApplicationController
   include Authenticatable
 
   before_action :authenticate_admin!, except: [ :index ]
-  before_action :set_vacancy, only: [ :update, :destroy, :toggle_display ]
 
   def index
     published_only = params[:published] == "true"
@@ -18,61 +17,30 @@ class VacanciesController < ApplicationController
 
   def create
     result = Vacancies::CreateService.new(vacancy_params, serializer: VacancySerializer, request: request).call
-
-    if result[:success]
-      render json: result[:data], status: :created
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    handle_result(result, success_status: :created)
   end
 
   def update
-    result = Vacancies::UpdateService.new(@vacancy, vacancy_params, serializer: VacancySerializer, request: request).call
-
-    if result[:success]
-      render json: result[:data]
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    result = Vacancies::UpdateService.new(params[:id], vacancy_params, serializer: VacancySerializer, request: request).call
+    handle_result(result)
   end
 
   def destroy
-    result = Vacancies::DestroyService.new(@vacancy).call
-
-    if result[:success]
-      head :no_content
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    result = Vacancies::DestroyService.new(params[:id]).call
+    handle_result(result, success_status: :no_content)
   end
 
   def toggle_display
-    result = Shared::ToggleDisplayService.new(@vacancy, serializer: VacancySerializer, request: request).call
-
-    if result[:success]
-      render json: result[:data]
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    result = Shared::ToggleDisplayService.new(Vacancy, params[:id], serializer: VacancySerializer, request: request).call
+    handle_result(result)
   end
 
   def reorder
     result = Shared::ReorderService.new(Vacancy, params[:ids]).call
-
-    if result[:success]
-      head :no_content
-    else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
-    end
+    handle_result(result, success_status: :no_content)
   end
 
   private
-
-  def set_vacancy
-    @vacancy = Vacancy.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    render json: { error: "Vacancy not found" }, status: :not_found
-  end
 
   def vacancy_params
     params.permit(:name, :description, :photo)
