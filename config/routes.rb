@@ -38,4 +38,10 @@ Rails.application.routes.draw do
       patch :reorder
     end
   end
+
+  resources :call_requests, only: [ :index, :create ] do
+    member do
+      post :change_state
+    end
+  end
 end

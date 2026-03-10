@@ -1,0 +1,9 @@
+Запрос на звонок
+
+Имя: <%= @call_request.contact_name %>
+Телефон: <%= @call_request.phone %>
+<% if @call_request.comment.present? %>
+Комментарий: <%= @call_request.comment %>
+<% end %>
+
+Запрос получен: <%= @call_request.created_at.strftime("%d.%m.%Y %H:%M") %>
