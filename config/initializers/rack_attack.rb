@@ -40,7 +40,7 @@ class Rack::Attack
     [
       429,
       { "Content-Type" => "application/json" },
-      [{ error: "Слишком много запросов. Попробуйте позже." }.to_json]
+      [ { error: "Слишком много запросов. Попробуйте позже." }.to_json ]
     ]
   end
 end

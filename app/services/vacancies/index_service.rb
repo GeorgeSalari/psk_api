@@ -9,11 +9,12 @@ module Vacancies
     end
 
     def call
-      vacancies = if @published_only
-                    Vacancy.published.with_attached_photo
-                  else
-                    Vacancy.with_attached_photo.order(created_at: :desc)
-                  end
+      vacancies =
+        if @published_only
+          Vacancy.published.with_attached_photo
+        else
+          Vacancy.with_attached_photo.order(created_at: :desc)
+        end
       data = vacancies.map { |v| @serializer.new(v, request: @request).as_json }
       { success: true, data: data }
     end

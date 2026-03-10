@@ -9,11 +9,12 @@ module Certificates
     end
 
     def call
-      certificates = if @published_only
-                       Certificate.published.with_attached_photo
-                     else
-                       Certificate.with_attached_photo.order(created_at: :desc)
-                     end
+      certificates =
+        if @published_only
+          Certificate.published.with_attached_photo
+        else
+          Certificate.with_attached_photo.order(created_at: :desc)
+        end
       data = certificates.map { |c| @serializer.new(c, request: @request).as_json }
       { success: true, data: data }
     end
