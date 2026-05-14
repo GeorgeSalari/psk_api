@@ -10,7 +10,7 @@ gem "sidekiq", "~> 8.1"
 gem "rack-cors"
 gem "rack-attack"
 gem "bcrypt", "~> 3.1"
-gem "jwt", "~> 3.1"
+gem "jwt", "~> 3.2"
 gem "ahoy_matey"
 gem "aws-sdk-s3", require: false
 gem "bootsnap", require: false
